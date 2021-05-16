@@ -3,8 +3,6 @@ TakeOne = {
     shortName = "TO",
     name = "TakeOne",
     version = "0.1.0",
-	
-	currentBank = nil,
 
 }
 
@@ -168,12 +166,12 @@ function TakeOne:isValid(inventorySlot)
 	  
 	  self:Debug("    GuildId: <<1>>", guildId)
 	  
-	  if not guildID then
+	  if not guildId then
 	      return false
 	  end
-	  if not DoesGuildHavePrivilege(self.currentBank, GUILD_PRIVILEGE_BANK_DEPOSIT) then
+	  if not DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_BANK_DEPOSIT) then
 	      return false
-      elseif not( DoesPlayerHaveGuildPermission(self.currentBank, GUILD_PERMISSION_BANK_DEPOSIT) and DoesPlayerHaveGuildPermission(self.currentBank, GUILD_PERMISSION_BANK_WITHDRAW) ) then
+      elseif not( DoesPlayerHaveGuildPermission(guildId, GUILD_PERMISSION_BANK_DEPOSIT) and DoesPlayerHaveGuildPermission(guildId, GUILD_PERMISSION_BANK_WITHDRAW) ) then
 	      return false
 	  end
 	end
@@ -203,7 +201,7 @@ ZO_CreateStringId("TO_CONTEXT_MENU", "Take 1")
 function TakeOne:ShowContextMenu(inventorySlot, slotActions)
 
     -- Check inventorySlot validity
-	if not self.isValid() then
+	if not self:isValid(inventorySlot) then
 	    return
 	end
 
