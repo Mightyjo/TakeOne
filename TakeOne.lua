@@ -3,6 +3,8 @@ TakeOne = {
     shortName = "TO",
     name = "TakeOne",
     version = "0.1.0",
+	
+	currentBank = nil,
 
 }
 
@@ -51,25 +53,34 @@ function TakeOne:OnAddOnLoaded(event, addonName)
     self.savedCharVariables  = ZO_SavedVars:NewCharacterIdSettings("TakeOneVariables", 1, nil, {})
 	self:CreateMenu()
 
---    EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CRAFTING_STATION_INTERACT,     function(...) self:StationInteract(...) end)
     LibCustomMenu:RegisterContextMenu(function(...) self:ShowContextMenu(...) end, LibCustomMenu.CATEGORY_LATE)
 	
 	self:Debug("<<1>> Loaded", self.displayName)
 
 end
 
-function TakeOne:DoTake(inventorySlot)
+function TakeOne:DoTake(inventorySlot, _itemId)
     self:Debug("    Entered DoTake")
 	
 	local slotType = ZO_InventorySlot_GetType(inventorySlot)
 	local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(inventorySlot)
 	if not slotIndex then
+	    self:Debug("    Slot no longer available")
+	    PlaySound("Justice_PickpocketFailed")
+	    return
+	end
+	
+	local itemLink = GetItemLink(bagId, slotIndex)
+	local itemId = GetItemLinkItemId(itemLink)
+	if not( _itemId == itemId ) then
+	    self:Debug("   Slot contents changed")
 	    PlaySound("Justice_PickpocketFailed")
 	    return
 	end
 	
 	local targetSlot = FindFirstEmptySlotInBag(BAG_BACKPACK)
 	if not targetSlot then
+	    self:Debug("   No available slots in backpack")
 	    PlaySound("Justice_PickpocketFailed")
 		return
 	end
@@ -80,9 +91,9 @@ function TakeOne:DoTake(inventorySlot)
 	if slotType == SLOT_TYPE_BANK_ITEM then
   	    CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
 	elseif slotType == SLOT_TYPE_GUILD_BANK_ITEM then
-	    EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoSplit(bagId, slotIndex, quantity))
+	    EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoSplit(itemId, quantity))
 		EVENT_MANAGER:AddFilterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
-	    self:Debug("    Sending DoSplit for <<1>>, <<2>>", bagId, slotIndex)
+	    self:Debug("    Sending DoSplit for <<1>>, <<2>>", itemId, quantity)
 		TransferFromGuildBank(slotIndex)	
 	else
 	    return
@@ -91,29 +102,36 @@ function TakeOne:DoTake(inventorySlot)
 	self:Debug("    Leaving DoTake")
 end
 
-function TakeOne:DoSplit(bagId, slotIndex, quantity)
-  return function(eventCode, _bagId, _slotIndex, isNewItem, itemSoundCategory, updateReason, stackCountChange)
-      self:Debug("    Entered DoSplit for <<1>>, <<2>>", bagId, slotIndex)
-      if not( _bagId == BAG_BACKPACK ) then
-          self:Debug("    Not in backpack: <<1>>", _bagId)
+function TakeOne:DoSplit(itemId, quantity)
+  return function(eventCode, bagId, slotIndex, isNewItem, itemSoundCategory, updateReason, stackCountChange)
+      self:Debug("    Entered DoSplit for <<1>>, <<2>>", itemId, quantity)
+      if not( bagId == BAG_BACKPACK ) then
+          self:Debug("    Not in backpack: <<1>>", bagId)
           return
       end
       
-      local _quantity = GetSlotStackSize(_bagId, _slotIndex)
-      self:Debug("    Expected qty=<<1>>; Got qty=<<2>>", quantity, _quantity)
+	  local itemLink = GetItemLink(bagId, slotIndex)
+	  local _itemId = GetItemLinkItemId(itemLink)
+	  if not( _itemId == itemId ) then
+	      self:Debug("   Not the item we're looking for: <<1>> (<<2>>)", _itemId, itemId )
+	      return
+	  end
+	  
+      local _quantity = GetSlotStackSize(bagId, slotIndex)
       if not( quantity == _quantity ) then
+	      self:Debug("   Not the quantity we're expecting: <<1>> (<<2>>)", _quantity, quantity )
           return
       end
                
       EVENT_MANAGER:UnregisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE)
                
-      local _targetSlot = FindFirstEmptySlotInBag(BAG_BACKPACK)
+      local targetSlot = FindFirstEmptySlotInBag(BAG_BACKPACK)
       
       
-      EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoReturn(_bagId, _slotIndex, _targetSlot))
+      EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoReturn(bagId, slotIndex, targetSlot))
       EVENT_MANAGER:AddFilterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
       self:Debug("    Sending DoReturn for <<1>>, <<2>>", _bagId, _slotIndex)
-      CallSecureProtected("RequestMoveItem", _bagId, _slotIndex, BAG_BACKPACK, _targetSlot, 1)
+      CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
                
       self:Debug("    Leaving DoSplit")
   end
@@ -133,31 +151,70 @@ function TakeOne:DoReturn(bagId, slotIndex, targetSlot)
     end
 end
 
+function TakeOne:isValid(inventorySlot)
+    local slotType = ZO_InventorySlot_GetType(inventorySlot)
+    local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(inventorySlot)
+	
+	self:Debug(" SlotType: <<1>>", slotType)
+	
+    -- Check that this is a BANK or GUILD_BANK slot
+	if not( slotType == SLOT_TYPE_BANK_ITEM or slotType == SLOT_TYPE_GUILD_BANK_ITEM ) then
+        return false
+    end
+	
+	-- Check that guild has a 
+	if slotType == SLOT_TYPE_GUILD_BANK_ITEM then
+	  local guildId = GetSelectedGuildBankId()
+	  
+	  self:Debug("    GuildId: <<1>>", guildId)
+	  
+	  if not guildID then
+	      return false
+	  end
+	  if not DoesGuildHavePrivilege(self.currentBank, GUILD_PRIVILEGE_BANK_DEPOSIT) then
+	      return false
+      elseif not( DoesPlayerHaveGuildPermission(self.currentBank, GUILD_PERMISSION_BANK_DEPOSIT) and DoesPlayerHaveGuildPermission(self.currentBank, GUILD_PERMISSION_BANK_WITHDRAW) ) then
+	      return false
+	  end
+	end
+	
+	self:Debug("   Has bank privileges")
+	
+	-- Check that the BACKPACK has enough room to operate
+	if slotType == SLOT_TYPE_BANK_ITEM and not CheckInventorySpaceSilently(1) then 
+	    return false
+	elseif slotType == SLOT_TYPE_GUILD_BANK_ITEM and not CheckInventorySpaceSilently(2) then
+	    return false
+	end
+	
+	self:Debug("   Has enough bag space")
+	
+	-- Check that the source stack contains more than 1 item
+	if not (GetSlotStackSize(bagId, slotIndex) > 1) then
+	    return false
+	end
+	
+	self:Debug("   Source stack is large enough")
+	
+	return true
+end
+
 ZO_CreateStringId("TO_CONTEXT_MENU", "Take 1")
 function TakeOne:ShowContextMenu(inventorySlot, slotActions)
 
---  Check this is in a guild bank
-    local slotType = ZO_InventorySlot_GetType(inventorySlot)
-	self:Debug(" SlotType: <<1>>", slotType)
-    if not( slotType == SLOT_TYPE_BANK_ITEM or slotType == SLOT_TYPE_GUILD_BANK_ITEM ) then
-        return
-    end
+    -- Check inventorySlot validity
+	if not self.isValid() then
+	    return
+	end
 
 
     local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(inventorySlot)
     local itemLink = GetItemLink(bagId, slotIndex)
+	local itemId = GetItemLinkItemId(itemLink)
 	
-	self:Debug(" BagID: <<1>>;  slotIndex: <<2>>", bagId, slotIndex)
-
-    if not CheckInventorySpaceSilently(2) then
-	    return
-    end
+	self:Debug(" BagID: <<1>>;  slotIndex: <<2>>; itemId: <<3>>", bagId, slotIndex, itemId)
 	
-	if not (GetSlotStackSize(bagId, slotIndex) > 1) then
-	    return
-	end
-	
-	slotActions:AddCustomSlotAction(TO_CONTEXT_MENU, function() self:DoTake(inventorySlot) end, "")
+	slotActions:AddCustomSlotAction(TO_CONTEXT_MENU, function() self:DoTake(inventorySlot, itemId) end, "")
 	 
 end
 
