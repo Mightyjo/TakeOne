@@ -1,5 +1,8 @@
 Change Log
 
+v1.0.1
+Fixed a context menu clobbering interaction with other banking add-ons
+
 v1.0.0
 Initial release
 

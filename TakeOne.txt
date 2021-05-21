@@ -1,9 +1,10 @@
 ## Title: TakeOne
 ## APIVersion: 100034 100035
-## AddonVersion: 1.0.0
+## Version: 1.0.1
+## AddonVersion: 2
 ## SavedVariables: TakeOneVariables
 ## Author: mightyjo
-## DependsOn: LibAddonMenu-2.0 LibCustomMenu LibMarify
+## DependsOn: LibAddonMenu-2.0>=32 LibCustomMenu>=635 LibMarify>=1211
 
 ## Thanks! @Marify / |c66ffff|Valandil|r / @Architectura / @Magnum1997
 

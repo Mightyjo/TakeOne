@@ -2,7 +2,7 @@ TakeOne = {
     displayName = "Take One",
     shortName = "TO",
     name = "TakeOne",
-    version = "1.0.0",
+    version = "1.0.1",
 
 }
 
@@ -51,7 +51,7 @@ function TakeOne:OnAddOnLoaded(event, addonName)
     self.savedCharVariables  = ZO_SavedVars:NewCharacterIdSettings("TakeOneVariables", 1, nil, {})
 	self:CreateMenu()
 
-    LibCustomMenu:RegisterContextMenu(function(...) self:ShowContextMenu(...) end, LibCustomMenu.CATEGORY_LATE)
+    LibCustomMenu:RegisterContextMenu(function(...) self:ShowContextMenu(...) end, LibCustomMenu.CATEGORY_PRIMARY)
 	
 	self:Debug("<<1>> Loaded", self.displayName)
 
