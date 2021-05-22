@@ -2,7 +2,7 @@ TakeOne = {
     displayName = "Take One",
     shortName = "TO",
     name = "TakeOne",
-    version = "1.0.1",
+    version = "1.0.2",
 
 }
 
@@ -51,7 +51,7 @@ function TakeOne:OnAddOnLoaded(event, addonName)
     self.savedCharVariables  = ZO_SavedVars:NewCharacterIdSettings("TakeOneVariables", 1, nil, {})
 	self:CreateMenu()
 
-    LibCustomMenu:RegisterContextMenu(function(...) self:ShowContextMenu(...) end, LibCustomMenu.CATEGORY_PRIMARY)
+    LibCustomMenu:RegisterContextMenu(function(...) self:ShowContextMenu(...) end, LibCustomMenu.CATEGORY_LATE)
 	
 	self:Debug("<<1>> Loaded", self.displayName)
 
@@ -197,7 +197,6 @@ function TakeOne:isValid(inventorySlot)
 	return true
 end
 
-ZO_CreateStringId("TO_CONTEXT_MENU", "Take 1")
 function TakeOne:ShowContextMenu(inventorySlot, slotActions)
 
     -- Check inventorySlot validity
@@ -212,8 +211,10 @@ function TakeOne:ShowContextMenu(inventorySlot, slotActions)
 	
 	self:Debug(" BagID: <<1>>;  slotIndex: <<2>>; itemId: <<3>>", bagId, slotIndex, itemId)
 	
-	slotActions:AddCustomSlotAction(TO_CONTEXT_MENU, function() self:DoTake(inventorySlot, itemId) end, "")
+	AddCustomMenuItem(GetString(TO_CONTEXT_MENU), function() self:DoTake(inventorySlot, itemId) end)
+
 	 
 end
 
+ZO_CreateStringId("TO_CONTEXT_MENU", "Take 1")
 EVENT_MANAGER:RegisterForEvent(TakeOne.name, EVENT_ADD_ON_LOADED, function(...) TakeOne:OnAddOnLoaded(...) end)

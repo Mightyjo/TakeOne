@@ -1,11 +1,11 @@
 ## Title: TakeOne
 ## APIVersion: 100034 100035
-## Version: 1.0.1
-## AddonVersion: 2
+## Version: 1.0.2
+## AddonVersion: 3
 ## SavedVariables: TakeOneVariables
 ## Author: mightyjo
 ## DependsOn: LibAddonMenu-2.0>=32 LibCustomMenu>=635 LibMarify>=1211
 
-## Thanks! @Marify / |c66ffff|Valandil|r / @Architectura / @Magnum1997
+## Thanks! @Marify / |c66ffff|Valandil|r / @Architectura / @Magnum1997 / Baertram
 
 TakeOne.lua
