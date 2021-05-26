@@ -4,6 +4,10 @@ TakeOne = {
     name = "TakeOne",
     version = "1.1.0",
     logger = nil,
+	variablesVersion = 2,
+	variablesDefault = {
+	  isDebug = false,
+	}
 	
 }
 
@@ -41,7 +45,7 @@ end
 function TakeOne:Info(text, ...)
     
 	if self.logger then
-	  selfLog(LibDebugLogger.LOG_LEVEL_INFO, text, ...)
+	  self:Log(LibDebugLogger.LOG_LEVEL_INFO, text, ...)
 	else
 	  if ... ~= nil then
 	    text = zo_strformat(text, unpack({...}))
@@ -90,11 +94,13 @@ function TakeOne:Log(level, text, ...)
 	  return
 	end
 	
+	local _logger = self.logger
+	
 	local switch = {
-	  [LibDebugLogger.LOG_LEVEL_DEBUG] = function (text) self.logger:Debug(text) end,
-	  [LibDebugLogger.LOG_LEVEL_INFO] = function (text) self.logger:Info(text) end,
-	  [LibDebugLogger.LOG_LEVEL_WARNING] = function (text) self.logger:Warn(text) end,
-	  [LibDebugLogger.LOG_LEVEL_ERROR] = function (text) self.logger:Error(text) end,
+	  [LibDebugLogger.LOG_LEVEL_DEBUG] = function (text) _logger:Debug(text) end,
+	  [LibDebugLogger.LOG_LEVEL_INFO] = function (text) _logger:Info(text) end,
+	  [LibDebugLogger.LOG_LEVEL_WARNING] = function (text) _logger:Warn(text) end,
+	  [LibDebugLogger.LOG_LEVEL_ERROR] = function (text) _logger:Error(text) end,
 	  default = nil,
 	}
 	
@@ -119,7 +125,7 @@ function TakeOne:OnAddOnLoaded(event, addonName)
 	  self.logger = LibDebugLogger(self.name)
 	end
 
-    self.savedVariables = ZO_SavedVars:NewAccountWide("TakeOneVariables", 1, nil, {})
+    self.savedVariables = ZO_SavedVars:NewAccountWide("TakeOneVariables", TakeOne.variablesVersion, nil, TakeOne.variablesDefault, {})
 	--self.savedCharVariables  = ZO_SavedVars:NewCharacterIdSettings("TakeOneVariables", 1, nil, {})
 	self:CreateMenu()
 
