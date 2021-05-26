@@ -125,7 +125,7 @@ function TakeOne:OnAddOnLoaded(event, addonName)
 	  self.logger = LibDebugLogger(self.name)
 	end
 
-    self.savedVariables = ZO_SavedVars:NewAccountWide("TakeOneVariables", TakeOne.variablesVersion, nil, TakeOne.variablesDefault, {})
+    self.savedVariables = ZO_SavedVars:NewAccountWide("TakeOneVariables", TakeOne.variablesVersion, nil, TakeOne.variablesDefault)
 	--self.savedCharVariables  = ZO_SavedVars:NewCharacterIdSettings("TakeOneVariables", 1, nil, {})
 	self:CreateMenu()
 
