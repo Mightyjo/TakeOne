@@ -1,5 +1,8 @@
 Change Log
 
+v1.1.1
+Bugfix - don't crash on load. It's rude.
+
 v.1.1.0
 Add translation support.
 Switch logging to LibDebugLogger.

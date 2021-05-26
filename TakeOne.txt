@@ -1,7 +1,7 @@
 ## Title: TakeOne
 ## APIVersion: 100034 100035
-## Version: 1.1.0
-## AddonVersion: 4
+## Version: 1.1.1
+## AddonVersion: 5
 ## SavedVariables: TakeOneVariables
 ## Author: mightyjo
 ## DependsOn: LibAddonMenu-2.0>=32 LibCustomMenu>=635 LibDebugLogger>=180

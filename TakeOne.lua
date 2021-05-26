@@ -2,10 +2,10 @@ TakeOne = {
     displayName = "Take One",
     shortName = "TO",
     name = "TakeOne",
-    version = "1.1.0",
+    version = "1.1.1",
     logger = nil,
 	variablesVersion = 2,
-	variablesDefault = {
+	Default = {
 	  isDebug = false,
 	}
 	
@@ -23,12 +23,13 @@ function TakeOne:CreateMenu()
         registerForDefaults = true,
     }
     LibAddonMenu2:RegisterAddonPanel(self.displayName, panelData)
-
-
+    
+    
+    local debugOptionName = GetString(TAKE_ONE_OPTION_DEBUG)
     local optionsTable = {
         {
             type = "checkbox",
-            name = GetString(TAKE_ONE_OPTION_DEBUG),
+            name = debugOptionName,
             getFunc = function()
                 return self.savedVariables.isDebug
             end,
@@ -125,7 +126,7 @@ function TakeOne:OnAddOnLoaded(event, addonName)
 	  self.logger = LibDebugLogger(self.name)
 	end
 
-    self.savedVariables = ZO_SavedVars:NewAccountWide("TakeOneVariables", TakeOne.variablesVersion, nil, TakeOne.variablesDefault)
+    self.savedVariables = ZO_SavedVars:NewAccountWide("TakeOneVariables", self.variablesVersion, nil, self.Default)
 	--self.savedCharVariables  = ZO_SavedVars:NewCharacterIdSettings("TakeOneVariables", 1, nil, {})
 	self:CreateMenu()
 
@@ -207,7 +208,7 @@ function TakeOne:DoSplit(itemId, quantity)
       EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoReturn(bagId, slotIndex, targetSlot))
       EVENT_MANAGER:AddFilterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
 	  
-      self:Debug(GetString(TAKE_ONE_DO_SPLIT_SENDING), _bagId, _slotIndex)
+      self:Debug(GetString(TAKE_ONE_DO_SPLIT_SENDING), bagId, slotIndex)
       CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
 
   end
