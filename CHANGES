@@ -1,5 +1,14 @@
 Change Log
 
+v.1.1.0
+Add dependency on LibDebugLogger.
+Switch debugging to LibDebugLogger directly.
+Drop dependency on LibMarify.
+Add translation support.
+
+v1.0.2
+Fix the context menu clobbering properly by using AddCustomMenuItem instead of AddCustomSlotAction.
+
 v1.0.1
 Fixed a context menu clobbering interaction with other banking add-ons
 
