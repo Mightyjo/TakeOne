@@ -1,5 +1,8 @@
 Change Log
 
+v1.1.2
+Chore - Track ESO API version number.
+
 v1.1.1
 Bugfix - don't crash on load. It's rude.
 
