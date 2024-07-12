@@ -1,5 +1,6 @@
 
 SafeAddString("TAKE_ONE_CONTEXT_MENU", "Take 1", 2)
+SafeAddString("TAKE_ONE_CONTEXT_MENU_GREEDY", "Leave 1", 2)
 SafeAddString("TAKE_ONE_OPTION_DEBUG", "Show Debug Log", 2)
 SafeAddString("TAKE_ONE_LOADED", "Loaded", 2)
 SafeAddString("TAKE_ONE_SLOT_FULL", "DoTake: Slot no longer available", 2)

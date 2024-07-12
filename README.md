@@ -11,6 +11,7 @@ Optionally depends on:
 - DebugLogViewer
 
 This add-on provides a context menu option to pull one item from a Bank or Guild Bank stack into your inventory.
+NEW in v1.2.0! This add-on provides a context menu option to pull all but one item from a Bank or Guild Bank stack into your inventory.
 
 The context menu item will only appear when all the preconditions to use it are met
 - The source slot is in your Bank or Guild Bank.

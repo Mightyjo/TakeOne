@@ -2,7 +2,7 @@ TakeOne = {
     displayName = "Take One",
     shortName = "TO",
     name = "TakeOne",
-    version = "1.1.4",
+    version = "1.2.0",
     logger = nil,
 	variablesVersion = 2,
 	Default = {
@@ -136,7 +136,7 @@ function TakeOne:OnAddOnLoaded(event, addonName)
 
 end
 
-function TakeOne:DoTake(inventorySlot, _itemId)
+function TakeOne:DoTake(inventorySlot, _itemId, greedy)
     	
 	local slotType = ZO_InventorySlot_GetType(inventorySlot)
 	local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(inventorySlot)
@@ -165,20 +165,24 @@ function TakeOne:DoTake(inventorySlot, _itemId)
 	self:Debug(GetString(TAKE_ONE_DO_TAKE_ACTION), quantity)
 	
 	if slotType == SLOT_TYPE_BANK_ITEM then
-  	    CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
+	    if greedy == true then
+		    CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, quantity-1)
+		else
+  	        CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
+		end
 	elseif slotType == SLOT_TYPE_GUILD_BANK_ITEM then
-	    EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoSplit(itemId, quantity))
+	    EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoSplit(itemId, quantity, greedy))
 		EVENT_MANAGER:AddFilterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
 		
-	    self:Debug(GetString(TAKE_ONE_DO_TAKE_SENDING), itemId, quantity)
-		TransferFromGuildBank(slotIndex)	
+		self:Debug(GetString(TAKE_ONE_DO_TAKE_SENDING), itemId, quantity, greedy)
+		TransferFromGuildBank(slotIndex)
 	else
 	    return
 	end
 	
 end
 
-function TakeOne:DoSplit(itemId, quantity)
+function TakeOne:DoSplit(itemId, quantity, greedy)
   return function(eventCode, bagId, slotIndex, isNewItem, itemSoundCategory, updateReason, stackCountChange)
 
       if not( bagId == BAG_BACKPACK ) then
@@ -209,7 +213,11 @@ function TakeOne:DoSplit(itemId, quantity)
       EVENT_MANAGER:AddFilterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
 	  
       self:Debug(GetString(TAKE_ONE_DO_SPLIT_SENDING), bagId, slotIndex)
-      CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
+	  if greedy == true then
+	      CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, quantity-1)
+      else
+          CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
+	  end
 
   end
 end
@@ -279,7 +287,8 @@ function TakeOne:ShowContextMenu(inventorySlot, slotActions)
 	
 	self:Debug(GetString(TAKE_ONE_CONTEXT_MENU_INFO), bagId, slotIndex, itemId)
 	
-	AddCustomMenuItem(GetString(TAKE_ONE_CONTEXT_MENU), function() self:DoTake(inventorySlot, itemId) end)
+	AddCustomMenuItem(GetString(TAKE_ONE_CONTEXT_MENU), function() self:DoTake(inventorySlot, itemId, false) end)
+	AddCustomMenuItem(GetString(TAKE_ONE_CONTEXT_MENU_GREEDY), function() self:DoTake(inventorySlot, itemId, true) end)
 
 	 
 end

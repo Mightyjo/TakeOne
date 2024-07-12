@@ -2,6 +2,9 @@
 ZO_CreateStringId("TAKE_ONE_CONTEXT_MENU", "Take 1")
 SafeAddVersion(TAKE_ONE_CONTEXT_MENU, 1)
 
+ZO_CreateStringId("TAKE_ONE_CONTEXT_MENU_GREEDY", "Leave 1")
+SafeAddVersion(TAKE_ONE_CONTEXT_MENU, 1)
+
 ZO_CreateStringId("TAKE_ONE_OPTION_DEBUG", "Show Debug Log")
 SafeAddVersion(TAKE_ONE_OPTION_DEBUG, 1)
 
