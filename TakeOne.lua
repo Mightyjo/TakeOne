@@ -2,7 +2,7 @@ TakeOne = {
     displayName = "Take One",
     shortName = "TO",
     name = "TakeOne",
-    version = "1.2.0",
+    version = "1.2.1",
     logger = nil,
 	variablesVersion = 2,
 	Default = {
@@ -240,11 +240,11 @@ function TakeOne:isValid(inventorySlot)
     local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(inventorySlot)
 	
     -- Check that this is a BANK or GUILD_BANK slot
-	if not( slotType == SLOT_TYPE_BANK_ITEM or slotType == SLOT_TYPE_GUILD_BANK_ITEM ) then
+	if not( slotType == SLOT_TYPE_BANK_ITEM or slotType == SLOT_TYPE_GUILD_BANK_ITEM or slotType == SLOT_TYPE_CRAFT_BAG_ITEM) then
         return false
     end
 	
-	-- Check that guild has a 
+	-- Check that guild has a bank the user can access
 	if slotType == SLOT_TYPE_GUILD_BANK_ITEM then
 	  local guildId = GetSelectedGuildBankId()
 	  
@@ -259,7 +259,7 @@ function TakeOne:isValid(inventorySlot)
 	end
 	
 	-- Check that the BACKPACK has enough room to operate
-	if slotType == SLOT_TYPE_BANK_ITEM and not CheckInventorySpaceSilently(1) then 
+	if ( slotType == SLOT_TYPE_BANK_ITEM or slotType == SLOT_TYPE_CRAFT_BAG_ITEM ) and not CheckInventorySpaceSilently(1) then 
 	    return false
 	elseif slotType == SLOT_TYPE_GUILD_BANK_ITEM and not CheckInventorySpaceSilently(2) then
 	    return false
