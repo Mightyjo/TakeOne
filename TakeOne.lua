@@ -170,6 +170,14 @@ function TakeOne:DoTake(inventorySlot, _itemId, greedy)
 		else
   	        CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
 		end
+	elseif slotType == SLOT_TYPE_CRAFT_BAG_ITEM then
+		if greedy == true then
+			CallSecureProtected("PickupInventoryItem", bagId, slotIndex, quantity-1)
+			CallSecureProtected("PlaceInInventory", BAG_BACKPACK, targetSlot)
+		else
+			CallSecureProtected("PickupInventoryItem", bagId, slotIndex, 1)
+			CallSecureProtected("PlaceInInventory", BAG_BACKPACK, targetSlot)
+		end
 	elseif slotType == SLOT_TYPE_GUILD_BANK_ITEM then
 	    EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoSplit(itemId, quantity, greedy))
 		EVENT_MANAGER:AddFilterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
