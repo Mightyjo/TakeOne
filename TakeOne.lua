@@ -383,10 +383,4 @@ function TakeOne:ShowContextMenu(inventorySlot, slotActions)
     )
 end
 
-EVENT_MANAGER:RegisterForEvent(
-    TakeOne.name,
-    EVENT_ADD_ON_LOADED,
-    function(...)
-        TakeOne:OnAddOnLoaded(...)
-    end
-)
+EVENT_MANAGER:RegisterForEvent(TakeOne.name, EVENT_ADD_ON_LOADED, function(...) TakeOne:OnAddOnLoaded(...) end)
