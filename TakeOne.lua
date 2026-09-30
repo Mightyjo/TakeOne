@@ -2,7 +2,7 @@ TakeOne = {
     displayName = "Take One",
     shortName = "TO",
     name = "TakeOne",
-    version = "1.2.1",
+    version = "1.3.0",
     logger = nil,
 	variablesVersion = 2,
 	Default = {
@@ -170,14 +170,6 @@ function TakeOne:DoTake(inventorySlot, _itemId, greedy)
 		else
   	        CallSecureProtected("RequestMoveItem", bagId, slotIndex, BAG_BACKPACK, targetSlot, 1)
 		end
-	elseif slotType == SLOT_TYPE_CRAFT_BAG_ITEM then
-		if greedy == true then
-			CallSecureProtected("PickupInventoryItem", bagId, slotIndex, quantity-1)
-			CallSecureProtected("PlaceInInventory", BAG_BACKPACK, targetSlot)
-		else
-			CallSecureProtected("PickupInventoryItem", bagId, slotIndex, 1)
-			CallSecureProtected("PlaceInInventory", BAG_BACKPACK, targetSlot)
-		end
 	elseif slotType == SLOT_TYPE_GUILD_BANK_ITEM then
 	    EVENT_MANAGER:RegisterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, self:DoSplit(itemId, quantity, greedy))
 		EVENT_MANAGER:AddFilterForEvent(self.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
@@ -248,7 +240,7 @@ function TakeOne:isValid(inventorySlot)
     local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(inventorySlot)
 	
     -- Check that this is a BANK or GUILD_BANK slot
-	if not( slotType == SLOT_TYPE_BANK_ITEM or slotType == SLOT_TYPE_GUILD_BANK_ITEM or slotType == SLOT_TYPE_CRAFT_BAG_ITEM or slotType == SLOT_TYPE_FURNITURE_VAULT) then
+	if not( slotType == SLOT_TYPE_BANK_ITEM or slotType == SLOT_TYPE_GUILD_BANK_ITEM  or slotType == SLOT_TYPE_FURNITURE_VAULT) then
         return false
     end
 	
@@ -267,7 +259,7 @@ function TakeOne:isValid(inventorySlot)
 	end
 	
 	-- Check that the BACKPACK has enough room to operate
-	if ( slotType == SLOT_TYPE_BANK_ITEM or slotType == SLOT_TYPE_CRAFT_BAG_ITEM or slotType == SLOT_TYPE_FURNITURE_VAULT ) and not CheckInventorySpaceSilently(1) then
+	if ( slotType == SLOT_TYPE_BANK_ITEM  or slotType == SLOT_TYPE_FURNITURE_VAULT ) and not CheckInventorySpaceSilently(1) then
 	    return false
 	elseif slotType == SLOT_TYPE_GUILD_BANK_ITEM and not CheckInventorySpaceSilently(2) then
 	    return false
